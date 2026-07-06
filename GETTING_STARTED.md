@@ -6,14 +6,7 @@ Welcome to the Cosmology Summer School. This guide will get you up and running i
 
 ## 1. Get the materials
 
-Download or clone this repository:
-
-```bash
-git clone https://github.com/tgbar/2026-IA-summer.git
-cd 2026-IA-summer
-```
-
-Or click the green **Code** button on GitHub and choose **Download ZIP**.
+Go to https://github.com/tgbar/2026-IA-summer, click the green **Code** button and choose **Download ZIP**. Extract the folder somewhere convenient on your machine.
 
 ---
 
