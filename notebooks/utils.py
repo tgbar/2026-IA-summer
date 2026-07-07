@@ -47,7 +47,7 @@ def tH(h=0.7):
     """Hubble time 1/H0 in Gyr.  tH ~ 13.97 Gyr for h=0.7."""
     return 9.778 / h
 
-def Or_obs(h=0.7):
+def Or_from_h(h=0.7):
     """Radiation density parameter today: Or = 4.18e-5 / h^2."""
     return 4.18e-5 / h**2
 
@@ -67,7 +67,7 @@ def de_model(model, Om, Ok=0, Or=0, **params):
     Om     : float — Omega_m today
     Ok     : float — curvature parameter (default 0, flat)
     Or     : float — radiation parameter (default 0, no radiation)
-                     use Or_obs(h) for the physical value
+                     use Or_from_h(h) for the physical value
     **params : model-specific parameters
         CPL  : w0, wa
         lCDM : lam
@@ -228,7 +228,7 @@ def solve_distances(Om, rho_de, Ok=0, Or=0, z_max=3.0, n_points=1000):
     def rhs(z, y):
         return [1.0 / Ez(z)]
 
-    z_arr = np.linspace(0, z_max, n_points)
+    z_arr = np.linspace(1e-4, z_max, n_points)
 
     sol = solve_ivp(rhs, [0, z_max], [0.0],
                     t_eval=z_arr, max_step=z_max/n_points, rtol=1e-8)

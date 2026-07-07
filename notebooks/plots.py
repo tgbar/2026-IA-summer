@@ -206,7 +206,7 @@ def plot_mu(z, d_L, Om, Ok=0, h=0.7, z_min=None, z_max=None):
     z_min = z_min if z_min is not None else z[0]
     z_max = z_max if z_max is not None else z[-1]
     mask  = (z >= z_min) & (z <= z_max)
-    mu = 5 * np.log10(d_L[mask] * DH(h) * 1e6 / 10)
+    mu = 5 * np.log10(d_L[mask] * DH(h)) + 25
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.plot(z[mask], mu)
     ax.set_xlabel(r'redshift $z$')
