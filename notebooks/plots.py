@@ -25,75 +25,119 @@ def _title(Om, Ok):
     return f'$\\Omega_m={Om},\\ \\Omega_\\Lambda={OL:.2f},\\ \\Omega_k={Ok:.2f}$ — {curvature}'
 
 
+def _t_mask(t, t_min, t_max):
+    """Boolean mask for time range. None means use full range."""
+    t_min = t_min if t_min is not None else t[0]
+    t_max = t_max if t_max is not None else t[-1]
+    return (t >= t_min) & (t <= t_max), t_min, t_max
+
+
+def _a_mask(a, a_min, a_max):
+    """Boolean mask for scale factor range. None means use full range."""
+    a_min = a_min if a_min is not None else a[0]
+    a_max = a_max if a_max is not None else a[-1]
+    return (a >= a_min) & (a <= a_max), a_min, a_max
+
+
 # ---------------------------------------------------------------------------
 # Dynamics plots
 # ---------------------------------------------------------------------------
 
-def plot_at(t, a, Om, Ok=0):
-    """Plot scale factor a(t)."""
+def plot_at(t, a, Om, Ok=0, t_min=None, t_max=None):
+    """Plot scale factor a(t).
+
+    Parameters
+    ----------
+    t_min, t_max : float or None — time range to plot (H0^-1)
+    """
+    mask, t_min, t_max = _t_mask(t, t_min, t_max)
     fig, ax = plt.subplots(figsize=(9, 5))
-    ax.plot(t, a, color='#2a78d6')
+    ax.plot(t[mask], a[mask], color='#2a78d6')
     ax.axvline(0, color='black', lw=0.8, ls='--', alpha=0.5, label='today')
     ax.axhline(1, color='black', lw=0.5, alpha=0.3)
     ax.set_xlabel(r'time  $(H_0^{-1})$')
     ax.set_ylabel(r'scale factor  $a(t)$')
     ax.set_title(_title(Om, Ok))
-    ax.set_xlim(t[0], t[-1])
-    ax.set_ylim(0, a.max() * 1.1)
+    ax.set_xlim(t_min, t_max)
+    ax.set_ylim(0, a[mask].max() * 1.1)
     ax.legend(fontsize=10)
     plt.tight_layout()
     plt.show()
 
 
-def plot_adot(t, adot, Om, Ok=0):
-    """Plot expansion rate adot(t)."""
+def plot_adot(t, adot, Om, Ok=0, t_min=None, t_max=None):
+    """Plot expansion rate adot(t).
+
+    Parameters
+    ----------
+    t_min, t_max : float or None — time range to plot (H0^-1)
+    """
+    mask, t_min, t_max = _t_mask(t, t_min, t_max)
     fig, ax = plt.subplots(figsize=(9, 5))
-    ax.plot(t, adot, color='#2a78d6')
+    ax.plot(t[mask], adot[mask], color='#2a78d6')
     ax.axvline(0, color='black', lw=0.8, ls='--', alpha=0.5, label='today')
     ax.axhline(0, color='black', lw=0.8, alpha=0.3)
     ax.set_xlabel(r'time  $(H_0^{-1})$')
     ax.set_ylabel(r'$\dot{a}$')
     ax.set_title(_title(Om, Ok))
-    ax.set_xlim(t[0], t[-1])
+    ax.set_xlim(t_min, t_max)
     ax.legend(fontsize=10)
     plt.tight_layout()
     plt.show()
 
 
-def plot_phase(a, adot, Om, Ok=0):
-    """Plot phase portrait: adot vs a."""
+def plot_phase(a, adot, Om, Ok=0, a_min=None, a_max=None):
+    """Plot phase portrait: adot vs a.
+
+    Parameters
+    ----------
+    a_min, a_max : float or None — scale factor range to plot
+    """
+    mask, a_min, a_max = _a_mask(a, a_min, a_max)
     fig, ax = plt.subplots(figsize=(9, 5))
-    ax.plot(a, adot, color='#e34948')
+    ax.plot(a[mask], adot[mask], color='#e34948')
     ax.axhline(0, color='black', lw=0.8, alpha=0.3)
     ax.axvline(1, color='black', lw=0.8, ls='--', alpha=0.5, label='today')
     ax.set_xlabel(r'scale factor  $a$')
     ax.set_ylabel(r'$\dot{a}$')
     ax.set_title(_title(Om, Ok))
+    ax.set_xlim(a_min, a_max)
     ax.legend(fontsize=10)
     plt.tight_layout()
     plt.show()
 
 
-def plot_adotdot(t, a, Om, rho_de, drho_de, Ok=0):
-    """Plot acceleration adotdot(t)."""
-    add = adotdot(a, Om, rho_de, drho_de, Ok)
+def plot_adotdot(t, a, Om, rho_de, drho_de, Ok=0, Or=0, t_min=None, t_max=None):
+    """Plot acceleration adotdot(t).
+
+    Parameters
+    ----------
+    t_min, t_max : float or None — time range to plot (H0^-1)
+    """
+    mask, t_min, t_max = _t_mask(t, t_min, t_max)
+    add = adotdot(a[mask], Om, rho_de, drho_de, Ok, Or)
     fig, ax = plt.subplots(figsize=(9, 5))
-    ax.plot(t, add, color='#4a3aa7')
+    ax.plot(t[mask], add, color='#4a3aa7')
     ax.axhline(0, color='black', lw=0.8, alpha=0.3)
     ax.axvline(0, color='black', lw=0.8, ls='--', alpha=0.5, label='today')
     ax.set_xlabel(r'time  $(H_0^{-1})$')
     ax.set_ylabel(r'$\ddot{a}$')
     ax.set_title(_title(Om, Ok))
-    ax.set_xlim(t[0], t[-1])
+    ax.set_xlim(t_min, t_max)
     ax.legend(fontsize=10)
     plt.tight_layout()
     plt.show()
 
 
-def plot_densities(a, Om, rho_de, Ok=0):
-    """Plot log energy densities vs N = ln(a)."""
-    OL = 1 - Om - Ok
-    N_plot = np.linspace(np.log(a.min()), np.log(a.max()), 500)
+def plot_densities(a, Om, rho_de, Ok=0, a_min=None, a_max=None):
+    """Plot log energy densities vs N = ln(a).
+
+    Parameters
+    ----------
+    a_min, a_max : float or None — scale factor range to plot
+    """
+    _, a_min, a_max = _a_mask(a, a_min, a_max)
+    N_plot = np.linspace(np.log(a_min), np.log(a_max), 500)
     a_plot = np.exp(N_plot)
 
     rho_m = Om  * a_plot**(-3)
@@ -130,26 +174,44 @@ def plot_densities(a, Om, rho_de, Ok=0):
 # Distance plots
 # ---------------------------------------------------------------------------
 
-def plot_dL(z, d_L, Om, Ok=0, h=0.7):
-    """Plot luminosity distance d_L(z) in Mpc."""
+def plot_dL(z, d_L, Om, Ok=0, h=0.7, z_min=None, z_max=None):
+    """Plot luminosity distance d_L(z) in Mpc.
+
+    Parameters
+    ----------
+    z_min, z_max : float or None — redshift range to plot
+    """
     from utils import DH
+    z_min = z_min if z_min is not None else z[0]
+    z_max = z_max if z_max is not None else z[-1]
+    mask  = (z >= z_min) & (z <= z_max)
     fig, ax = plt.subplots(figsize=(9, 5))
-    ax.plot(z, d_L * DH(h))
+    ax.plot(z[mask], d_L[mask] * DH(h))
     ax.set_xlabel(r'redshift $z$')
     ax.set_ylabel(r'$d_L(z)$  [Mpc]')
     ax.set_title(_title(Om, Ok) + f', $h={h}$')
+    ax.set_xlim(z_min, z_max)
     plt.tight_layout()
     plt.show()
 
 
-def plot_mu(z, d_L, Om, Ok=0, h=0.7):
-    """Plot distance modulus mu(z)."""
+def plot_mu(z, d_L, Om, Ok=0, h=0.7, z_min=None, z_max=None):
+    """Plot distance modulus mu(z).
+
+    Parameters
+    ----------
+    z_min, z_max : float or None — redshift range to plot
+    """
     from utils import DH
-    mu = 5 * np.log10(d_L * DH(h) * 1e6 / 10)  # d_L in pc
+    z_min = z_min if z_min is not None else z[0]
+    z_max = z_max if z_max is not None else z[-1]
+    mask  = (z >= z_min) & (z <= z_max)
+    mu = 5 * np.log10(d_L[mask] * DH(h) * 1e6 / 10)
     fig, ax = plt.subplots(figsize=(9, 5))
-    ax.plot(z, mu)
+    ax.plot(z[mask], mu)
     ax.set_xlabel(r'redshift $z$')
     ax.set_ylabel(r'distance modulus $\mu$  [mag]')
     ax.set_title(_title(Om, Ok) + f', $h={h}$')
+    ax.set_xlim(z_min, z_max)
     plt.tight_layout()
     plt.show()
