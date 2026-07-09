@@ -184,9 +184,11 @@ def solve_friedmann(Om, rho_de, drho_de, Ok=0, Or=0,
     t_bwd = np.linspace(0, -t_backward, n_points)
 
     sol_fwd = solve_ivp(rhs, [0,  t_forward],  y0, t_eval=t_fwd,
-                        events=hit_zero, max_step=0.001, rtol=1e-8)
+                    events=hit_zero,
+                    max_step=0.001, rtol=1e-8)  # remove max_step for speed if not exploring exotic cosmologies
     sol_bwd = solve_ivp(rhs, [0, -t_backward], y0, t_eval=t_bwd,
-                        events=hit_zero, max_step=0.001, rtol=1e-8)
+                    events=hit_zero,
+                    max_step=0.001, rtol=1e-8)  # remove max_step for speed if not exploring exotic cosmologies
 
     t    = np.concatenate([sol_bwd.t[::-1],    sol_fwd.t[1:]])
     a    = np.concatenate([sol_bwd.y[0][::-1], sol_fwd.y[0][1:]])
@@ -232,8 +234,8 @@ def solve_distances(Om, rho_de, Ok=0, Or=0, z_max=3.0, n_points=1000):
     z_arr = np.linspace(1e-4, z_max, n_points)
 
     sol = solve_ivp(rhs, [0, z_max], [0.0],
-                    t_eval=z_arr, max_step=z_max/n_points, rtol=1e-8)
-
+                t_eval=z_arr, rtol=1e-8)
+    
     z   = sol.t
     d_c = sol.y[0]
     d_L = (1 + z) * d_c
