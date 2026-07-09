@@ -91,8 +91,8 @@ def de_model(model, Om, Ok=0, Or=0, **params):
 
     elif model == 'lCDM':
         lam     = params['lam']
-        rho_de  = lambda a: OL * a**(-lam**2)
-        drho_de = lambda a: -lam**2 * OL * a**(-lam**2)
+        rho_de  = lambda a: OL * a**(-lam**2) + (lam**2 / (lam**2 - 3)) * Om * (a**(-lam**2)  - a**(-3) )
+        drho_de = lambda a: -lam**2 * OL * a**(-lam**2) + (lam**2 / (lam**2 - 3)) * Om * (-lam**2 * a**(-lam**2) + 3 * a**(-3))
 
     else:
         raise ValueError(f"Unknown model '{model}'. Choose 'LCDM', 'CPL', or 'lCDM'.")
@@ -224,6 +224,7 @@ def solve_distances(Om, rho_de, Ok=0, Or=0, z_max=3.0, n_points=1000):
     """
     def Ez(z):
         return np.sqrt(np.abs(E2(z_to_a(z), Om, rho_de, Ok, Or)))
+        #return np.sqrt(0.3*(1+z)**3 + 1 - 0.3)  # hardcoded LCDM
 
     def rhs(z, y):
         return [1.0 / Ez(z)]
