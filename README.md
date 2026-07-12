@@ -1,6 +1,6 @@
 # 2026 IA Cosmology Summer School
 
-A three-week intensive program covering the dynamics of the universe, dark energy models, cosmological observables, and Bayesian parameter inference. Aimed at first and second year physics students.
+A three-week intensive program covering the dynamics of the universe, dark energy models, cosmological observables, and Bayesian parameter inference. 
 
 ---
 
